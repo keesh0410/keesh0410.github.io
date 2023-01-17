@@ -1,0 +1,283 @@
+<!DOCTYPE html><html lang="zh-Hans" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>7 概率图模型 | 蔡奇栩</title><meta name="author" content="John Doe"><meta name="copyright" content="John Doe"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="概率图模型概率图模型使用图的方式表示概率分布。为了在图中添加各种概率，首先总结一下随机变量分布的一些规则：  \begin{align} &amp;Sum\ Rule:p(x_1)&#x3D;\int p(x_1,x_2)dx_2\\ &amp;Product\ Rule:p(x_1,x_2)&#x3D;p(x_1|x_2)p(x_2)\\ &amp;Chain\ Rule:p(x_1,x_2,\cdots,x_p)&#x3D;\prod\limit">
+<meta property="og:type" content="article">
+<meta property="og:title" content="7 概率图模型">
+<meta property="og:url" content="http://example.com/2023/01/16/7-%E6%A6%82%E7%8E%87%E5%9B%BE%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="蔡奇栩">
+<meta property="og:description" content="概率图模型概率图模型使用图的方式表示概率分布。为了在图中添加各种概率，首先总结一下随机变量分布的一些规则：  \begin{align} &amp;Sum\ Rule:p(x_1)&#x3D;\int p(x_1,x_2)dx_2\\ &amp;Product\ Rule:p(x_1,x_2)&#x3D;p(x_1|x_2)p(x_2)\\ &amp;Chain\ Rule:p(x_1,x_2,\cdots,x_p)&#x3D;\prod\limit">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/Users/keesh/Desktop/cat.png">
+<meta property="article:published_time" content="2023-01-16T14:02:41.000Z">
+<meta property="article:modified_time" content="2023-01-16T15:44:27.389Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/Users/keesh/Desktop/cat.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2023/01/16/7-%E6%A6%82%E7%8E%87%E5%9B%BE%E6%A8%A1%E5%9E%8B/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'mediumZoom',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '7 概率图模型',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-16 23:44:27'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = url => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/Users/keesh/Desktop/cat.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时光隧道</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 模块分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 小清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 小链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="蔡奇栩"><span class="site-name">蔡奇栩</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时光隧道</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 模块分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 小清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 小链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">7 概率图模型</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-01-16T14:02:41.000Z" title="Created 2023-01-16 22:02:41">2023-01-16</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-01-16T15:44:27.389Z" title="Updated 2023-01-16 23:44:27">2023-01-16</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>12min</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="概率图模型"><a href="#概率图模型" class="headerlink" title="概率图模型"></a>概率图模型</h1><p>概率图模型使用图的方式表示概率分布。为了在图中添加各种概率，首先总结一下随机变量分布的一些规则：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+&Sum\ Rule:p(x_1)=\int p(x_1,x_2)dx_2\\
+&Product\ Rule:p(x_1,x_2)=p(x_1|x_2)p(x_2)\\
+&Chain\ Rule:p(x_1,x_2,\cdots,x_p)=\prod\limits_{i=1}^pp(x_i|x_{i+1,x_{i+2} \cdots}x_p)\\
+&Bayesian\ Rule:p(x_1|x_2)=\frac{p(x_2|x_1)p(x_1)}{p(x_2)}
+\end{align}</script><p>可以看到，在链式法则中，如果数据维度特别高，那么的采样和计算非常困难，我们需要在一定程度上作出简化，在朴素贝叶斯中，作出了条件独立性假设。在 Markov 假设中，给定数据的维度是以时间顺序出现的，给定当前时间的维度，那么下一个维度与之前的维度独立。在 HMM 中，采用了齐次 Markov 假设。在 Markov 假设之上，更一般的，加入条件独立性假设，对维度划分集合 $A,B,C$，使得 $X_A\perp X_B|X_C$。</p>
+<p>概率图模型采用图的特点表示上述的条件独立性假设，节点表示随机变量，边表示条件概率。概率图模型可以分为三大理论部分：</p>
+<ol>
+<li>表示：<ol>
+<li>有向图（离散）：贝叶斯网络</li>
+<li>高斯图（连续）：高斯贝叶斯和高斯马尔可夫网路</li>
+<li>无向图（离散）：马尔可夫网络</li>
+</ol>
+</li>
+<li>推断<ol>
+<li>精确推断</li>
+<li>近似推断<ol>
+<li>确定性近似（如变分推断）</li>
+<li>随机近似（如 MCMC）</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>学习<ol>
+<li>参数学习<ol>
+<li>完备数据</li>
+<li>隐变量：E-M 算法</li>
+</ol>
+</li>
+<li>结构学习</li>
+</ol>
+</li>
+</ol>
+<h2 id="有向图-贝叶斯网络"><a href="#有向图-贝叶斯网络" class="headerlink" title="有向图-贝叶斯网络"></a>有向图-贝叶斯网络</h2><p>已知联合分布中，各个随机变量之间的依赖关系，那么可以通过拓扑排序（根据依赖关系）可以获得一个有向图。而如果已知一个图，也可以直接得到联合概率分布的因子分解：</p>
+<script type="math/tex; mode=display">
+p(x_1,x_2,\cdots,x_p)=\prod\limits_{i=1}^pp(x_i|x_{parent(i)})</script><p>那么实际的图中条件独立性是如何体现的呢？在局部任何三个节点，可以有三种结构：</p>
+<ol>
+<li><p>```mermaid<br>graph TB;</p>
+<pre><code>A((A))--&gt;B((B));
+B--&gt;C((C));
+</code></pre><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">   $$</span><br><span class="line">   p(A,B,C)=p(A)p(B|A)p(C|B)=p(A)p(B|A)p(C|B,A)\\</span><br><span class="line">   \Longrightarrow p(C|B)=p(C|B,A)\\</span><br><span class="line">   \Leftrightarrow p(C|B)p(A|B)=p(C|A,B)p(A|B)=p(C,A|B)\\</span><br><span class="line">   \Longrightarrow C\perp A|B</span><br><span class="line">   $$</span><br><span class="line"></span><br><span class="line">2. ```mermaid</span><br><span class="line">   graph TB;</span><br><span class="line">   	B((B))--&gt;A((A));</span><br><span class="line">   	B--&gt;C((C));</span><br></pre></td></tr></table></figure>
+<script type="math/tex; mode=display">
+p(A,B,C)=p(A|B)p(B)p(C|B)=p(B)p(A|B)p(C|A,B)\\
+\Longrightarrow p(C|B)=p(C|B,A)\\
+\Leftrightarrow p(C|B)p(A|B)=p(C|A,B)p(A|B)=p(C,A|B)\\
+\Longrightarrow C\perp A|B</script></li>
+<li><p>```mermaid<br>graph TB;</p>
+<pre><code>A((A))--&gt;B((B));
+C((C))--&gt;B
+</code></pre><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">   $$</span><br><span class="line">   p(A,B,C)=p(A)p(C)p(B|C,A)=p(A)p(C|A)p(B|C,A)\\</span><br><span class="line">   \Longrightarrow p(C)=p(C|A)\\</span><br><span class="line">   \Leftrightarrow C\perp A\\</span><br><span class="line">   $$</span><br><span class="line"></span><br><span class="line">   对这种结构，$A,C$ 不与 $B$ 条件独立。</span><br><span class="line"></span><br><span class="line">从整体的图来看，可以引入 D 划分的概念。对于类似上面图 1和图 2的关系，引入集合A，B，那么满足 $A\perp B|C$ 的 $C$ 集合中的点与 $A,B$  中的点的关系都满足图 1，2，满足图3 关系的点都不在 $C$ 中。D 划分应用在贝叶斯定理中：</span><br><span class="line">$$</span><br><span class="line">p(x_i|x_&#123;-i&#125;)=\frac&#123;p(x)&#125;&#123;\int p(x)dx_&#123;i&#125;&#125;=\frac&#123;\prod\limits_&#123;j=1&#125;^pp(x_j|x_&#123;parents(j)&#125;)&#125;&#123;\int\prod\limits_&#123;j=1&#125;^pp(x_j|x_&#123;parents(j)&#125;)dx_i&#125;</span><br><span class="line">$$</span><br><span class="line">可以发现，上下部分可以分为两部分，一部分是和 $x_i$ 相关的，另一部分是和 $x_i$ 无关的，而这个无关的部分可以相互约掉。于是计算只涉及和 $x_i$ 相关的部分。</span><br><span class="line"></span><br><span class="line">与 $x_i$ 相关的部分可以写成：</span><br><span class="line">$$</span><br><span class="line">p(x_i|x_&#123;parents(i)&#125;)p(x_&#123;child(i)&#125;|x_i)</span><br><span class="line">$$</span><br><span class="line">这些相关的部分又叫做 Markov 毯。</span><br><span class="line"></span><br><span class="line">实际应用的模型中，对这些条件独立性作出了假设，从单一到混合，从有限到无限（时间，空间）可以分为：</span><br><span class="line"></span><br><span class="line">1.  朴素贝叶斯，单一的条件独立性假设 $p(x|y)=\prod\limits_&#123;i=1&#125;^pp(x_i|y)$，在 D 划分后，所有条件依赖的集合就是单个元素。</span><br><span class="line">2.  高斯混合模型：混合的条件独立。引入多类别的隐变量 $z_1, z_2,\cdots,z_k$， $p(x|z)=\mathcal&#123;N&#125;(\mu,\Sigma)$，条件依赖集合为多个元素。</span><br><span class="line">3.  与时间相关的条件依赖</span><br><span class="line">    1.  Markov 链</span><br><span class="line">    2.  高斯过程（无限维高斯分布）</span><br><span class="line">4.  连续：高斯贝叶斯网络</span><br><span class="line">5.  组合上面的分类</span><br><span class="line">    *   GMM 与时序结合：动态模型</span><br><span class="line">        *   HMM（离散）</span><br><span class="line">        *   线性动态系统 LDS（Kalman 滤波）</span><br><span class="line">        *   粒子滤波（非高斯，非线性）</span><br><span class="line"></span><br><span class="line">## 无向图-马尔可夫网络（马尔可夫随机场）</span><br><span class="line"></span><br><span class="line">无向图没有了类似有向图的局部不同结构，在马尔可夫网络中，也存在 D 划分的概念。直接将条件独立的集合 $x_A\perp x_B|x_C$ 划分为三个集合。这个也叫全局 Markov。对局部的节点，$x\perp (X-Neighbour(\mathcal&#123;x&#125;))|Neighbour(x)$。这也叫局部 Markov。对于成对的节点：$x_i\perp x_j|x_&#123;-i-j&#125;$，其中 $i,j$ 不能相邻。这也叫成对 Markov。事实上上面三个点局部全局成对是相互等价的。</span><br><span class="line"></span><br><span class="line">有了这个条件独立性的划分，还需要因子分解来实际计算。引入团的概念：</span><br><span class="line"></span><br><span class="line">&gt;   团，最大团：图中节点的集合，集合中的节点之间相互都是连接的叫做团，如果不能再添加节点，那么叫最大团。</span><br><span class="line"></span><br><span class="line">利用这个定义进行的 $x$ 所有维度的联合概率分布的因子分解为，假设有 $K$ 个团，$Z$ 就是对所有可能取值求和：</span><br><span class="line">$$</span><br><span class="line">\begin&#123;align&#125;p(x)=\frac&#123;1&#125;&#123;Z&#125;\prod\limits_&#123;i=1&#125;^&#123;K&#125;\phi(x_&#123;ci&#125;)\\</span><br><span class="line">Z=\sum\limits_&#123;x\in\mathcal&#123;X&#125;&#125;\prod\limits_&#123;i=1&#125;^&#123;K&#125;\phi(x_&#123;ci&#125;)</span><br><span class="line">\end&#123;align&#125;</span><br><span class="line">$$</span><br><span class="line">其中 $\phi(x_&#123;ci&#125;)$ 叫做势函数，它必须是一个正值，可以记为：</span><br><span class="line">$$</span><br><span class="line">\phi(x_&#123;ci&#125;)=\exp(-E(x_&#123;ci&#125;))</span><br><span class="line">$$</span><br><span class="line"> 这个分布叫做 Gibbs 分布（玻尔兹曼分布）。于是也可以记为：$p(x)=\frac&#123;1&#125;&#123;Z&#125;\exp(-\sum\limits_&#123;i=1&#125;^KE(x_&#123;ci&#125;))$。这个分解和条件独立性等价（Hammesley-Clifford 定理），这个分布的形式也和指数族分布形式上相同，于是满足最大熵原理。</span><br><span class="line"></span><br><span class="line">## 两种图的转换-道德图</span><br><span class="line"></span><br><span class="line">我们常常想将有向图转为无向图，从而应用更一般的表达式。</span><br><span class="line"></span><br><span class="line">1. 链式：</span><br><span class="line"></span><br><span class="line">   ```mermaid</span><br><span class="line">   graph TB;</span><br><span class="line">   	A((A))--&gt;B((B));</span><br><span class="line">   	B--&gt;C((C));</span><br></pre></td></tr></table></figure>
+<p>直接去掉箭头，$p(a,b,c)=p(a)p(b|a)p(c|b)=\phi(a,b)\phi(b,c)$：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">graph TB;</span><br><span class="line">	A((A))---B((B));</span><br><span class="line">	B---C((C));</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>V 形：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">graph TB;</span><br><span class="line">	B((B))--&gt;A((A));</span><br><span class="line">	B--&gt;C((C));</span><br></pre></td></tr></table></figure>
+<p>由于 $p(a,b,c)=p(b)p(a|b)p(c|b)=\phi(a,b)\phi(b,c)$，直接去掉箭头：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">graph TB;</span><br><span class="line">	B((B))---A((A));</span><br><span class="line">	B---C((C));</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>倒 V 形：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">graph TB;</span><br><span class="line">	A((A))--&gt;B((B));</span><br><span class="line">	C((C))--&gt;B</span><br></pre></td></tr></table></figure>
+<p>由于 $p(a,b,c)=p(a)p(c)p(b|a,c)=\phi(a,b,c)$，于是在 $a,c$ 之间添加线：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">graph TD;</span><br><span class="line">	a((a))---b((b));</span><br><span class="line">	b---c((c));</span><br><span class="line">	a---c;</span><br></pre></td></tr></table></figure>
+<p>观察着三种情况可以概括为：</p>
+<ol>
+<li>将每个节点的父节点两两相连</li>
+<li>将有向边替换为无向边</li>
+</ol>
+</li>
+</ol>
+<h2 id="更精细的分解-因子图"><a href="#更精细的分解-因子图" class="headerlink" title="更精细的分解-因子图"></a>更精细的分解-因子图</h2><p>对于一个有向图，可以通过引入环的方式，可以将其转换为无向图（Tree-like graph），这个图就叫做道德图。但是我们上面的 BP 算法只对无环图有效，通过因子图可以变为无环图。</p>
+<p>考虑一个无向图：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">graph TD;</span><br><span class="line">	a((a))---b((b));</span><br><span class="line">	b---c((c));</span><br><span class="line">	a---c;</span><br></pre></td></tr></table></figure>
+<p>可以将其转为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">graph TD;</span><br><span class="line">	a((a))---f;</span><br><span class="line">	f---b((b));</span><br><span class="line">	f---c((c))</span><br></pre></td></tr></table></figure>
+<p>其中 $f=f(a,b,c)$。因子图不是唯一的，这是由于因式分解本身就对应一个特殊的因子图，将因式分解：$p(x)=\prod\limits_{s}f_s(x_s)$ 可以进一步分解得到因子图。</p>
+<h2 id="推断"><a href="#推断" class="headerlink" title="推断"></a>推断</h2><p>推断的主要目的是求各种概率分布，包括边缘概率，条件概率，以及使用 MAP 来求得参数。通常推断可以分为：</p>
+<ol>
+<li>精确推断<ol>
+<li>Variable Elimination(VE)</li>
+<li>Belief Propagation(BP, Sum-Product Algo)，从 VE 发展而来</li>
+<li>Junction Tree，上面两种在树结构上应用，Junction Tree 在图结构上应用</li>
+</ol>
+</li>
+<li>近似推断<ol>
+<li>Loop Belief Propagation（针对有环图）</li>
+<li>Mente Carlo Interference：例如 Importance Sampling，MCMC</li>
+<li>Variational Inference</li>
+</ol>
+</li>
+</ol>
+<h3 id="推断-变量消除（VE）"><a href="#推断-变量消除（VE）" class="headerlink" title="推断-变量消除（VE）"></a>推断-变量消除（VE）</h3><p>变量消除的方法是在求解概率分布的时候，将相关的条件概率先行求和或积分，从而一步步地消除变量，例如在马尔可夫链中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">graph LR;</span><br><span class="line">	a((a))--&gt;b((b));</span><br><span class="line">	b--&gt;c((c));</span><br><span class="line">	c--&gt;d((d))</span><br></pre></td></tr></table></figure>
+<script type="math/tex; mode=display">
+p(d)=\sum\limits_{a,b,c}p(a,b,c,d)=\sum\limits_cp(d|c)\sum\limits_bp(c|b)\sum\limits_ap(b|a)p(a)</script><p>变量消除的缺点很明显：</p>
+<ol>
+<li>计算步骤无法存储</li>
+<li>消除的最优次序是一个 NP-hard 问题</li>
+</ol>
+<h3 id="推断-信念传播（BP）"><a href="#推断-信念传播（BP）" class="headerlink" title="推断-信念传播（BP）"></a>推断-信念传播（BP）</h3><p>为了克服 VE 的第一个缺陷-计算步骤无法存储。我们进一步地对上面的马尔可夫链进行观察：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">graph LR;</span><br><span class="line">	a((a))--&gt;b((b));</span><br><span class="line">	b--&gt;c((c));</span><br><span class="line">	c--&gt;d((d));</span><br><span class="line">	d--&gt;e((e));</span><br></pre></td></tr></table></figure>
+<p>要求 $p(e)$，当然使用 VE，从 $a$ 一直消除到 $d$，记 $\sum\limits_ap(a)p(b|a)=m_{a\to b(b)}$，表示这是消除 $a$ 后的关于 $b$ 的概率，类似地，记 $\sum\limits_bp(c|b)m_{a\to b}(b)=m_{b\to c}(c)$。于是 $p(e)=\sum\limits_dp(e|d)m_{b\to c}(c)$。进一步观察，对 $p(c)$：</p>
+<script type="math/tex; mode=display">
+p(c)=[\sum\limits_bp(c|b)\sum\limits_ap(b|a)p(a)]\cdot[\sum\limits_dp(d|c)\sum\limits_ep(e)p(e|d)]</script><p>我们发现了和上面计算 $p(e)$ 类似的结构，这个式子可以分成两个部分，一部分是从 $a$ 传播过来的概率，第二部分是从 $ e$ 传播过来的概率。</p>
+<p>一般地，对于图（只对树形状的图）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">graph TD;</span><br><span class="line">	a((a))---b((b));</span><br><span class="line">	b---c((c));</span><br><span class="line">	b---d((d));</span><br></pre></td></tr></table></figure>
+<p>这四个团（对于无向图是团，对于有向图就是概率为除了根的节点为1），有四个节点，三个边：</p>
+<script type="math/tex; mode=display">
+p(a,b,c,d)=\frac{1}{Z}\phi_a(a)\phi_b(b)\phi_c(c)\phi_d(d)\cdot\phi_{ab}(a,b)\phi_{bc}(c,b)\phi_{bd}(d,b)</script><p>套用上面关于有向图的观察，如果求解边缘概率 $p(a)$，定义 $m_{c\to b}(b)=\sum\limits_c\phi_c(c)\phi_{bc}(bc)$，$m_{d\to b}(b)=\sum\limits_d\phi_d(d)\phi_{bd}(bd)$，$m_{b\to a}(a)=\sum\limits_b\phi_{ba}(ba)\phi_b(b)m_{c\to b}(b)_{d\to b}m(b)$，这样概率就一步步地传播到了 $a$：</p>
+<script type="math/tex; mode=display">
+p(a)=\phi_a(a)m_{b\to a}(a)</script><p>写成一般的形式，对于相邻节点 $i,j$：</p>
+<script type="math/tex; mode=display">
+m_{j\to i}(i)=\sum\limits_j\phi_j(j)\phi_{ij}(ij)\prod\limits_{k\in Neighbour(j)-i}m_{k\to j}(j)</script><p>这个表达式，就可以保存计算过程了，只要对每条边的传播分别计算，对于一个无向树形图可以递归并行实现：</p>
+<ol>
+<li>任取一个节点 $a$ 作为根节点</li>
+<li>对这个根节点的邻居中的每一个节点，收集信息（计算入信息）</li>
+<li>对根节点的邻居，分发信息（计算出信息）</li>
+</ol>
+<h3 id="推断-Max-Product-算法"><a href="#推断-Max-Product-算法" class="headerlink" title="推断-Max-Product 算法"></a>推断-Max-Product 算法</h3><p>在推断任务中，MAP 也是常常需要的，MAP 的目的是寻找最佳参数：</p>
+<script type="math/tex; mode=display">
+(\hat{a},\hat{b},\hat{c},\hat{d})=\mathop{argmax}_{a,b,c,d}p(a,b,c,d|E)</script><p>类似 BP，我们采用信息传递的方式来求得最优参数，不同的是，我们在所有信息传递中，传递的是最大化参数的概率，而不是将所有可能求和：</p>
+<script type="math/tex; mode=display">
+m_{j\to i}=\max\limits_{j}\phi_j\phi_{ij}\prod\limits_{k\in Neighbour(j)-i}m_{k\to j}</script><p>于是对于上面的图：</p>
+<script type="math/tex; mode=display">
+\max_a p(a,b,c,d)=\max_a\phi_a\phi_{ab}m_{c\to b}m_{d\to b}</script><p>这个算法是 Sum-Product 算法的改进，也是在 HMM 中应用给的 Viterbi 算法的推广。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="http://example.com">John Doe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://example.com/2023/01/16/7-%E6%A6%82%E7%8E%87%E5%9B%BE%E6%A8%A1%E5%9E%8B/">http://example.com/2023/01/16/7-%E6%A6%82%E7%8E%87%E5%9B%BE%E6%A8%A1%E5%9E%8B/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="/Users/keesh/Desktop/cat.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/16/8-%E6%9C%9F%E6%9C%9B%E6%9C%80%E5%A4%A7/" title="8 期望最大"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">8 期望最大</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/16/6-%E6%8C%87%E6%95%B0%E6%97%8F%E5%88%86%E5%B8%83/" title="6 指数族分布"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">6 指数族分布</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E7%8E%87%E5%9B%BE%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.</span> <span class="toc-text">概率图模型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%89%E5%90%91%E5%9B%BE-%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C"><span class="toc-number">1.1.</span> <span class="toc-text">有向图-贝叶斯网络</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B4%E7%B2%BE%E7%BB%86%E7%9A%84%E5%88%86%E8%A7%A3-%E5%9B%A0%E5%AD%90%E5%9B%BE"><span class="toc-number">1.2.</span> <span class="toc-text">更精细的分解-因子图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A8%E6%96%AD"><span class="toc-number">1.3.</span> <span class="toc-text">推断</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A8%E6%96%AD-%E5%8F%98%E9%87%8F%E6%B6%88%E9%99%A4%EF%BC%88VE%EF%BC%89"><span class="toc-number">1.3.1.</span> <span class="toc-text">推断-变量消除（VE）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A8%E6%96%AD-%E4%BF%A1%E5%BF%B5%E4%BC%A0%E6%92%AD%EF%BC%88BP%EF%BC%89"><span class="toc-number">1.3.2.</span> <span class="toc-text">推断-信念传播（BP）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A8%E6%96%AD-Max-Product-%E7%AE%97%E6%B3%95"><span class="toc-number">1.3.3.</span> <span class="toc-text">推断-Max-Product 算法</span></a></li></ol></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By John Doe</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">遇见你是一件非常开心的事情呀!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom/dist/medium-zoom.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script></div></body></html>

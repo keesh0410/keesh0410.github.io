@@ -1,0 +1,229 @@
+<!DOCTYPE html><html lang="zh-Hans" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>11 马尔可夫链蒙特卡洛 | 蔡奇栩</title><meta name="author" content="John Doe"><meta name="copyright" content="John Doe"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="马尔可夫链蒙特卡洛MCMC 是一种随机的近似推断，其核心就是基于采样的随机近似方法蒙特卡洛方法。对于采样任务来说，有下面一些常用的场景：  采样作为任务，用于生成新的样本 求和&#x2F;求积分  采样结束后，我们需要评价采样出来的样本点是不是好的样本集：  样本趋向于高概率的区域 样本之间必须独立  具体采样中，采样是一个困难的过程：  无法采样得到归一化因子，即无法直接对概率 $ p(x)&#x3D;\frac{">
+<meta property="og:type" content="article">
+<meta property="og:title" content="11 马尔可夫链蒙特卡洛">
+<meta property="og:url" content="http://example.com/2023/01/16/11-%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E9%93%BE%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B/index.html">
+<meta property="og:site_name" content="蔡奇栩">
+<meta property="og:description" content="马尔可夫链蒙特卡洛MCMC 是一种随机的近似推断，其核心就是基于采样的随机近似方法蒙特卡洛方法。对于采样任务来说，有下面一些常用的场景：  采样作为任务，用于生成新的样本 求和&#x2F;求积分  采样结束后，我们需要评价采样出来的样本点是不是好的样本集：  样本趋向于高概率的区域 样本之间必须独立  具体采样中，采样是一个困难的过程：  无法采样得到归一化因子，即无法直接对概率 $ p(x)&#x3D;\frac{">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/Users/keesh/Desktop/cat.png">
+<meta property="article:published_time" content="2023-01-16T14:04:17.000Z">
+<meta property="article:modified_time" content="2023-01-16T15:44:16.605Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/Users/keesh/Desktop/cat.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2023/01/16/11-%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E9%93%BE%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'mediumZoom',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '11 马尔可夫链蒙特卡洛',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-16 23:44:16'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = url => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/Users/keesh/Desktop/cat.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时光隧道</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 模块分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 小清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 小链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="蔡奇栩"><span class="site-name">蔡奇栩</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时光隧道</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 模块分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 小清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 小链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">11 马尔可夫链蒙特卡洛</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-01-16T14:04:17.000Z" title="Created 2023-01-16 22:04:17">2023-01-16</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-01-16T15:44:16.605Z" title="Updated 2023-01-16 23:44:16">2023-01-16</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">1.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>6min</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="马尔可夫链蒙特卡洛"><a href="#马尔可夫链蒙特卡洛" class="headerlink" title="马尔可夫链蒙特卡洛"></a>马尔可夫链蒙特卡洛</h1><p>MCMC 是一种随机的近似推断，其核心就是基于采样的随机近似方法蒙特卡洛方法。对于采样任务来说，有下面一些常用的场景：</p>
+<ol>
+<li>采样作为任务，用于生成新的样本</li>
+<li>求和/求积分</li>
+</ol>
+<p>采样结束后，我们需要评价采样出来的样本点是不是好的样本集：</p>
+<ol>
+<li>样本趋向于高概率的区域</li>
+<li>样本之间必须独立</li>
+</ol>
+<p>具体采样中，采样是一个困难的过程：</p>
+<ol>
+<li>无法采样得到归一化因子，即无法直接对概率 $ p(x)=\frac{1}{Z}\hat{p}(x)$ 采样，常常需要对 CDF 采样，但复杂的情况不行</li>
+<li>如果归一化因子可以求得，但是对高维数据依然不能均匀采样（维度灾难），这是由于对 $p$ 维空间，总的状态空间是 $K^p$ 这么大，于是在这种情况下，直接采样也不行</li>
+</ol>
+<p>因此需要借助其他手段，如蒙特卡洛方法中的拒绝采样，重要性采样和 MCMC。</p>
+<h2 id="蒙特卡洛方法"><a href="#蒙特卡洛方法" class="headerlink" title="蒙特卡洛方法"></a>蒙特卡洛方法</h2><p>蒙特卡洛方法旨在求得复杂概率分布下的期望值：$\mathbb{E}_{z|x}[f(z)]=\int p(z|x)f(z)dz\simeq\frac{1}{N}\sum\limits_{i=1}^Nf(z_i)$，也就是说，从概率分布中取 $N$ 个点，从而近似计算这个积分。采样方法有：</p>
+<ol>
+<li><p>概率分布采样，首先求得概率密度的累积密度函数 CDF，然后求得 CDF 的反函数，在0到1之间均匀采样，代入反函数，就得到了采样点。但是实际大部分概率分布不能得到 CDF。</p>
+</li>
+<li><p>Rejection Sampling 拒绝采样：对于概率分布 $p(z)$，引入简单的提议分布 $q(z)$，使得 $\forall z_i,Mq(z_i)\ge p(z_i)$。我们先在 $ q(z)$ 中采样，定义接受率：$\alpha=\frac{p(z^i)}{Mq(z^i)}\le1$。算法描述为：</p>
+<ol>
+<li>取 $z^i\sim q(z)$。</li>
+<li>在均匀分布中选取 $u$。</li>
+<li>如果 $u\le\alpha$，则接受 $z^i$，否则，拒绝这个值。</li>
+</ol>
+</li>
+<li><p>Importance Sampling：直接对期望：$\mathbb{E}_{p(z)}[f(z)]$ 进行采样。</p>
+<script type="math/tex; mode=display">
+\mathbb{E}_{p(z)}[f(z)]=\int p(z)f(z)dz=\int \frac{p(z)}{q(z)}f(z)q(z)dz\simeq\frac{1}{N}\sum\limits_{i=1}^Nf(z_i)\frac{p(z_i)}{q(z_i)}</script><p>于是采样在 $ q(z)$ 中采样，并通过权重计算和。重要值采样对于权重非常小的时候，效率非常低。重要性采样有一个变种 Sampling-Importance-Resampling，这种方法，首先和上面一样进行采样，然后在采样出来的 $N$ 个样本中，重新采样，这个重新采样，使用每个样本点的权重作为概率分布进行采样。</p>
+</li>
+</ol>
+<h2 id="MCMC"><a href="#MCMC" class="headerlink" title="MCMC"></a>MCMC</h2><p>马尔可夫链式一种时间状态都是离散的随机变量序列。我们关注的主要是齐次的一阶马尔可夫链。马尔可夫链满足：$p(X_{t+1}|X_1,X_2,\cdots,X_t)=p(X_{t+1}|X_t)$。这个式子可以写成转移矩阵的形式 $p_{ij}=p(X_{t+1}=j|X_t=i)$。我们有：</p>
+<script type="math/tex; mode=display">
+\pi_{t+1}(x^*)=\int\pi_i(x)p_{x\to x^*}dx</script><p>如果存在 $\pi=(\pi(1),\pi(2),\cdots),\sum\limits_{i=1}^{+\infin}\pi(i)=1$，有上式成立，这个序列就叫马尔可夫链 $X_t$ 的平稳分布，平稳分布就是表示在某一个时刻后，分布不再改变。MCMC 就是通过构建马尔可夫链概率序列，使其收敛到平稳分布 $p(z)$。引入细致平衡：$\pi(x)p_{x\to x^<em>}=\pi(x^</em>)p_{x^*\to x}$。如果一个分布满足细致平衡，那么一定满足平稳分布（反之不成立）：</p>
+<script type="math/tex; mode=display">
+\int\pi(x)p_{x\to x^*}dx=\int\pi(x^*)p_{x^*\to x}dx=\pi(x^*)</script><p>细致平衡条件将平稳分布的序列和马尔可夫链的转移矩阵联系在一起了，通过转移矩阵可以不断生成样本点。假定随机取一个转移矩阵 $(Q=Q_{ij})$，作为一个提议矩阵。我们有：</p>
+<script type="math/tex; mode=display">
+p(z)\cdot Q_{z\to z^*}\alpha(z,z^*)=p(z^*)\cdot Q_{z^*\to z}\alpha(z^*,z)</script><p>取 ：</p>
+<script type="math/tex; mode=display">
+\alpha(z,z^*)=\min\{1,\frac{p(z^*)Q_{z^*\to z}}{p(z)Q_{z\to z^*}}\}</script><p>则</p>
+<script type="math/tex; mode=display">
+p(z)\cdot Q_{z\to z^*}\alpha(z,z^*)=\min\{p(z)Q_{z\to z^*},p(z^*)Q_{z^*\to z}\}=p(z^*)\cdot Q_{z^*\to z}\alpha(z^*,z)</script><p>于是，迭代就得到了序列，这个算法叫做 Metropolis-Hastings 算法：</p>
+<ol>
+<li>通过在0，1之间均匀分布取点 $u$</li>
+<li>生成 $z^<em>\sim Q(z^</em>|z^{i-1})$</li>
+<li>计算 $\alpha$ 值</li>
+<li>如果 $\alpha\ge u$，则 $z^i=z^*$，否则 $z^{i}=z^{i-1}$</li>
+</ol>
+<p>这样取的样本就服从 $p(z)=\frac{\hat{p}(z)}{z_p}\sim \hat{p}(z)$。</p>
+<p>下面介绍另一种采样方式 Gibbs 采样，如果 $z$ 的维度非常高，那么通过固定被采样的维度其余的维度来简化采样过程：$z_i\sim p(z_i|z_{-i})$：</p>
+<ol>
+<li>给定初始值 $z_1^0,z_2^0,\cdots$</li>
+<li>在 $t+1$ 时刻，采样 $z_i^{t+1}\sim p(z_i|z_{-i})$，从第一个维度一个个采样。</li>
+</ol>
+<p>Gibbs 采样方法是一种特殊的 MH 采样，可以计算 Gibbs 采样的接受率：</p>
+<script type="math/tex; mode=display">
+\frac{p(z^*)Q_{z^*\to z}}{p(z)Q_{z\to z^*}}=\frac{p(z_i^*|z^*_{-i})p(z^*_{-i})p(z_i|z_{-i}^*)}{p(z_i|z_{-i})p(z_{-i})p(z_i^*|z_{-i})}</script><p>对于每个 Gibbs 采样步骤，$z_{-i}=z_{-i}^*$，这是由于每个维度 $i$ 采样的时候，其余的参量保持不变。所以上式为1。于是 Gibbs 采样过程中，相当于找到了一个步骤，使得所有的接受率为 1。</p>
+<h2 id="平稳分布"><a href="#平稳分布" class="headerlink" title="平稳分布"></a>平稳分布</h2><p>定义随机矩阵：</p>
+<script type="math/tex; mode=display">
+Q=\begin{pmatrix}Q_{11}&Q_{12}&\cdots&Q_{1K}\\\vdots&\vdots&\vdots&\vdots\\Q_{k1}&Q_{k2}&\cdots&Q_{KK}\end{pmatrix}</script><p>这个矩阵每一行或者每一列的和都是1。随机矩阵的特征值都小于等于1。假设只有一个特征值为 $\lambda_i=1$。于是在马尔可夫过程中：</p>
+<script type="math/tex; mode=display">
+q^{t+1}(x=j)=\sum\limits_{i=1}^Kq^t(x=i)Q_{ij}\\
+\Rightarrow q^{t+1}=q^t\cdot Q=q^1Q^t</script><p>于是有：</p>
+<script type="math/tex; mode=display">
+q^{t+1}=q^1A\Lambda^t A^{-1}</script><p>如果 $m$ 足够大，那么，$\Lambda^m=diag(0,0,\cdots,1,\cdots,0)$，则：$q^{m+1}=q^{m}$ ，则趋于平稳分布了。马尔可夫链可能具有平稳分布的性质，所以我们可以构建马尔可夫链使其平稳分布收敛于需要的概率分布（设计转移矩阵）。</p>
+<p>在采样过程中，需要经历一定的时间（燃烧期/混合时间）才能达到平稳分布。但是 MCMC 方法有一些问题：</p>
+<ol>
+<li>无法判断是否已经收敛</li>
+<li>燃烧期过长（维度太高，并且维度之间有关，可能无法采样到某些维度），例如在 GMM 中，可能无法采样到某些峰。于是在一些模型中，需要对隐变量之间的关系作出约束，如 RBM 假设隐变量之间无关。</li>
+<li>样本之间一定是有相关性的，如果每个时刻都取一个点，那么每个样本一定和前一个相关，这可以通过间隔一段时间采样。</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="http://example.com">John Doe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://example.com/2023/01/16/11-%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E9%93%BE%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B/">http://example.com/2023/01/16/11-%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E9%93%BE%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="/Users/keesh/Desktop/cat.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/16/12-%E9%9A%90%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E6%A8%A1%E5%9E%8B/" title="12 隐马尔可夫模型"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">12 隐马尔可夫模型</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/16/10-%E5%8F%98%E5%88%86%E6%8E%A8%E6%96%AD/" title="10 变分推断"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">10 变分推断</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E9%93%BE%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B"><span class="toc-number">1.</span> <span class="toc-text">马尔可夫链蒙特卡洛</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E6%96%B9%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">蒙特卡洛方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MCMC"><span class="toc-number">1.2.</span> <span class="toc-text">MCMC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B3%E7%A8%B3%E5%88%86%E5%B8%83"><span class="toc-number">1.3.</span> <span class="toc-text">平稳分布</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By John Doe</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">遇见你是一件非常开心的事情呀!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom/dist/medium-zoom.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script></div></body></html>
